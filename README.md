@@ -1,3 +1,5 @@
+[![npm version](https://badge.fury.io/js/react-native-custom-list.svg)](https://www.npmjs.com/package/react-native-custom-list) [![npm](https://img.shields.io/npm/dy/react-native-custom-list.svg)](https://www.npmjs.com/package/react-native-custom-list)
+
 ## Show Cases
 
 **Header animation**
