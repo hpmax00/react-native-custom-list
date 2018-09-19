@@ -1,0 +1,9 @@
+export const G_STATUS_NONE = 0, // 正常手势，没有上拉或者下拉刷新
+  STATUS_PULLING_DOWN = 1, // List  处于顶部，下拉刷新
+  STATUS_RELEASE_HEADER_TO_REFRESH = 2, // 拉动距离处于可触发刷新或者加载状态
+  STATUS_HEADER_REFRESHING = 3, // 顶部正在刷新
+  EVENT_HEADER_REFRESH = "SCROLL_LIST_HEADER_REFRESH_DONE", //刷新事件
+  T_HEADER_ANI = 260, // android 刷新头部动画时间
+  PULL_DOWN_DISTANCE = 60, // 下拉刷新下拉距离大于 60 时触发下拉刷新
+  PULL_DOWN_THRESHOLD = 10, // header距离顶部触发刷新的距离 android
+  PULL_FRICTION = 0.68; // 摩擦系数
