@@ -1,127 +1,68 @@
-# react-native-ptr-control
-React-native pull to refresh and pull-up load more component, supported custom refresh and load more component
+## Show Cases
 
-Supported Scroll Component is:
+**Header animation**
 
-* **ScrollView**
-* **ListView**
-* **FlatList**
-* **VirtualizedList**
+![](https://github.com/hpmax00/react-native-custom-list/blob/master/screen.gif)
 
-Supported React-Native Version is **>= 0.43.0**, because this lib supported FlatList
-## example
-example is in the folder of example, the app.js is the entrance, example run in environment:
-* expo: 23
-* react-native: 0.50.0
-* react: 16.0.0
+### Run example
 
-![](gif/ptr_ios.gif) ![](gif/ptr_android.gif)
-### run example
-**Suggest: run example in real device, the performance will perfect**
+```bash
+npm i
+```
 
-* `cd example`
+### Basic Usage
 
-* `yarn install`
+- Install react-native-custom-list
 
-* `yarn start`
+```bash
+$ npm install --save react-native-custom-list
+```
 
-and then take your iphone or android device, use the **_Expo_** app scan the QRCode, and have fun
+- Then, use this:
 
-**Be careful:**
-* if can not load project, see the detail, sometimes it cost long time to load, and sometimes, the **_Expo_** version
-is incorrect
-* checkout the network, whether is your device and your computer in the same network segment
-## Installation
-`$ npm install react-native-ptr-control --save`
-## Usage
-here is a simple usage of this lib, see example folder and find app.js for full usage
+```typescript
+import CustomList from "react-native-custom-list";
 
-**_Note: when use react-native-ptr-control, use it as usual, for example, if scrollComponent is 'ScrollView', pass ScrollView`s 
-props and props of lib provide, such as:_**
 
-* ScrollView
+export default class App extends React.Component {
+    render: function() {
+        return (
+          <CustomList
+              data={this.state.data}
+              renderItem={this.renderRow}
+              keyExtractor={this._getKeyExtrator}
+              extraData={this.state.data.length}
+              // getRef={ref => (this.refOfScrollList = ref)}
+              enableHeaderRefresh
+              refreshState={this.state.loading}
+              setHeaderHeight={225}
+              onTopReachedThreshold={10}
+              headerRefresh={HeaderRefresh}
+              onHeaderRefreshing={this.refresh}
+              onEndReached={this.loadMore}
+              ListFooterComponent={this.renderFooter}
+              onEndReachedThreshold={0.8}
+          />
+        )
+    }
+}
+```
+You can see detail in the example
 
-        import React, {Component} from 'react'
-        import {View, Text} from 'react-native'
-        import PTRControl from 'react-native-ptr-control'
-        export default class MyScrollComponent extends Component {
-          render () {
-            return (
-              <PTRControl
-                //here is the origin props of ScrollView
-                style={{flex: 1}}
-                showsVerticalScrollIndicator={false}
-                //here is the props of lib provide
-                scrollComponent={'ScrollView'}
-                enableFooterInfinite={false}>
-                <View>
-                  <Text>{'scroll content'}</Text>
-                </View>
-              </PTRControl>
-              )
-          }
-        }
-* ListView
+### Props
 
-        import React, {Component} from 'react'
-        import {View, Text} from 'react-native'
-        import PTRControl from 'react-native-ptr-control'
-        export default class MyScrollComponent extends Component {
-          render () {
-            return (
-              <PTRControl
-                //here is the origin props of ListView
-                dataSource={this.state.dataSource}
-                renderRow={this.renderRow}
-                showsVerticalScrollIndicator={false}
-                //here is the props of lib provide
-                scrollComponent={'ListView'}
-                />
-              )
-          }
-        }
-    
-## Properties
-**_Note: list of below props is extends props, the origin props of scroll component (for example: ScrollView) 
-should also be passed_**
-
-| Prop | Description | Type | Default | Platform | isRequired |
-|---|---|---|---|---|---|
-| *scrollComponent* | mark the scroll component, can be 'ScrollView', 'ListView', 'FlatList', 'VirtualizedList' | *string* | 'FlatList' | all | yes |
-| *getRef* | get the scroll component`s ref | *func* | _None_ | all | no |
-| *enableHeaderRefresh* | whether to enable header refresh | *bool* | true | all | no |
-| *setHeaderHeight* | if header refresh is set, this prop mark the header height, if header refresh is set, **this prop should be set** | *number* | 60 | _Android_ | no |
-| *onTopReachedThreshold* | threshold to trigger refresh | *number* | 10 | _Android_ | no |
-| *renderHeaderRefresh* | render the custom component of refresh header, and the *gestureStatus* and *offset* will be passed, see example for detail | *func* | default function | all | no |
-| *onHeaderRefreshing* | when release to refresh, this fun will be called, see example for detail | *func* | default function | all | no |
-| *pullFriction* | when scroll component is not full of children, pull to refresh is controlled by gesture, and this prop controls how fast to pull down, **range: 0 ~ 1** | *number* | 0.6 | _Android_ | no |
-| *enableFooterInfinite* | whether to enable footer load-more | *bool* | true | all | no |
-| *setFooterHeight* | if footer load-more is set, this prop mark the footer height, if footer load-more is set, **this prop should be set** | *number* | 60 | _Android_ | no |
-| *onEndReachedThreshold* | threshold to trigger load-more | *number* | 10 | _Android_ | no |
-| *renderFooterInfinite* | render the custom component of load-more, and the *gestureStatus* and *offset* will be passed, see example for detail | *func* | default function | all | no |
-| *onFooterInfiniting* | when release to load-more, this fun will be called, see example for detail | *func* | default function | all | no |
-
-#### onHeaderRefreshing and onFooterInfiniting
-this props should be passed a function, and *gestureStatus* and *offset* will be the params, something like that
-
-`onHeaderRefreshing = {(gestureStatus, offset) => <HeaderRefresh gestureStatus={gestureStatus} offset={offset/>}`
-
-`onFooterInfiniting = {(gestureStatus, offset) => <FooterInfinite gestureStatus={gestureStatus} offset={offset/>}`
-#### gestureStatus
-* 0: gesture none
-* 1: pull-up to load-more
-* 2: pull-down to refresh
-* 3: release to refresh or load-more
-* 4: on header refreshing
-* 5: on footer loading-more
-#### offset
-* when pull-down to refresh or pull-up to load-more, this offset params represent the pull distance 
-## static methods
-**_Important: when header refresh done, or footer load-more done, should call this static method_**
-* **headerRefreshDone** `PTRControl.headerRefreshDone()`
-
-  after onHeaderRefreshing, when refresh done, and the data load complete, call this method to stop refresh
-  
-* **footerInfiniteDone** `PTRControl.footerInfiniteDone()`
-
-  after onFooterInfiniting, when load-more done, and the data load complete, call this method to stop load-more
+| parameter              | type                                                                                   | required | description                                                                                                                                                                                                                          | default                                                   |
+| :--------------------- | :------------------------------------------------------------------------------------- | :------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------- |
+| data              | array                                                                                  | yes      | Data Source                                                                                                                                                                                                                         |                                                           |
+| renderItem        | function                                                                                | yes       | as FlatList renderItem                                                                                                                                                                                                                    | `true`                                                    |
+| keyExtractor            | function<br><br>`(content?: JSX.Element) => string`                                      | no       | as FlatList keyExtractor                                                                                                                                                                                                           | `() => {}`                                                |
+| extraData               | function<br><br>`() => void`                                                           | no       | as FlatList extraData                                                                                                                                                                                                        | `() => {}`                                                |
+| refreshState          | boolean                                                                                 | yes       | State indicate refresh                                                                                                                                                                                                     | `80`                                                      |
+| setHeaderHeight            | number                                                                                 | yes       | HeaderRefresh height                                                                                                                                                                 | `300`                                                     |
+| onTopReachedThreshold                  | number                                                                                 | no       | Init index of images                                                                                                                                                                                                                 | `0`                                                       |
+| enableHeaderRefresh        | boolean                                                  | no       | Enable Header Refresh                                                                                                                                                                                                                 | `''`                                                      |
+| headerRefresh          |  React.ReactElement<any>                                       | no       | HeaderRefresh component                                                                                                                                                                                                             | `() => null`                                              |
+| onHeaderRefreshing         | function<br><br>`() => void`                                              | no       | Function used to load data when refresh                                                                                                                                                                                                     | `() => {}`                                                |
+| onEndReached               | function<br><br>`() => void`                                              | no       | as FlatList onEndReached                                                                                                                                                                                                            | `() => {}`                                                |
+| ListFooterComponent | function<br><br> `() => React.ReactElement<any>`                                                                                | no       | as FlatList ListFooterComponent                                                                                                                                                                                              | `true`                                                    |
+| onEndReachedThreshold                | function<br><br>`(onCancel?: function) => void`                                        | no       | Onclick                                                                                                                                                                                                                              | `(onCancel) => {onCancel()}`                              |

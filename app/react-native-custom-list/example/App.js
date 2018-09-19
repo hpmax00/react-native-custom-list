@@ -1,211 +1,188 @@
-import React, {Component} from 'react'
-import {
-  View,
-  Text,
-  StyleSheet,
-  ListView,
-  Dimensions,
-  ActivityIndicator
-}  from 'react-native'
-import PTRControl from 'react-native-ptr-control'
+import React, {Component} from "react";
+import {Dimensions, StyleSheet, Text, View, Image, ActivityIndicator} from "react-native";
+import CustomList from "./app/react-native-custom-list";
+import {HeaderRefresh} from "./app/HeaderRefresh";
 
-class FooterInfinite extends Component {
-  static defaultProps = {
-    gestureStatus: 1
-  }
-
-  constructor(props) {
-    super(props)
-  }
-
-  render() {
-    let {gestureStatus} = this.props, _refreshFont = ''
-    switch (gestureStatus) {
-      case 1:
-        _refreshFont = 'pull-up-to-load-more'
-        break;
-      case 3:
-        _refreshFont = 'release-to-load'
-        break;
-      case 5:
-        _refreshFont = 'loading'
-        break;
-      default:
-        _refreshFont = 'pull-up-to-load-more'
-    }
-    return (
-      <View style={Styles.footerInfinite}>
-        {gestureStatus === 5 ?
-          <ActivityIndicator
-            size={'small'}
-            animating={true}
-            color={'#75c5fe'}
-            style={{marginRight: 10}}/> : null}
-        <Text style={Styles.refreshFont}>{_refreshFont}</Text>
-      </View>
-    );
-  }
-}
-
-class HeaderRefresh extends Component {
-  static defaultProps = {
-    gestureStatus: 2,
-    offset: 0
-  }
-
-  constructor(props) {
-    super(props)
-  }
-
-  render() {
-    let {gestureStatus} = this.props, _refreshFont = ''
-    switch (gestureStatus) {
-      case 2:
-        _refreshFont = 'pull-to-refresh'
-        break;
-      case 3:
-        _refreshFont = 'release-to-refresh'
-        break;
-      case 4:
-        _refreshFont = 'refreshing'
-        break;
-      default:
-        _refreshFont = 'pull-to-refresh'
-    }
-    return (
-      <View style={Styles.headerRefresh}>
-        {gestureStatus === 4 ?
-          <ActivityIndicator
-            size={'small'}
-            animating={true}
-            color={'#75c5fe'}
-            style={{marginRight: 10}}/> : null}
-        <Text style={Styles.refreshFont}>{_refreshFont}</Text>
-      </View>
-    )
-  }
-}
-
-const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2})
 export default class Example extends Component {
-  _timer = -1
-  data = []
+  _timer = -1;
+  data = [];
 
   constructor(props) {
-    super(props)
-    this.getData()
+    super(props);
+    this.getData();
     this.state = {
-      dataSource: ds.cloneWithRows(this.data)
-    }
+      data: this.data,
+      loading: false,
+      loadMore: false
+    };
+  }
+
+  componentWillUnmount() {
+    clearTimeout(this._timer)
   }
 
   getData(init) {
-    let total = 14
+    let total = 14;
     if (init) {
-      this.data = []
-      total = Math.ceil(Math.random() * 17)
+      this.data = [];
+      total = Math.ceil(Math.random() * 17);
     }
     for (let i = 0; i < total; i++) {
-      this.data.push('row' + Math.ceil(Math.random() * total))
+      this.data.push("row" + Math.ceil(Math.random() * total));
     }
   }
 
-  renderRow = (rowData, sectionID, rowID) => {
+  refresh = () => {
+    clearTimeout(this._timer);
+    this.setState({
+      loading: true
+    })
+    this.getData(true)
+    this._timer = setTimeout(() => {
+      this.setState({
+        data: this.data,
+        loading: false
+      })
+    }, 1000)
+  }
+
+  loadMore = () => {
+    if (!this.props.loading) {
+      if (!this.state.loadMore && this.state.data.length > 0) {
+        clearTimeout(this._timer);
+        this.setState({
+          loadMore: true
+        })
+        this.getData()
+        this._timer = setTimeout(() => {
+          this.setState({
+            data: this.data,
+            loadMore: false
+          })
+        }, 1000)
+      }
+    }
+  }
+
+  _getKeyExtrator(item, index) {
+    return item + '_' + index;
+  }
+
+  renderRow = ({ item, index }) => {
     return (
-      <View
-        style={Styles.flatListItem}>
-        <Text style={Styles.fontItem}>{rowData + ':' + rowID}</Text>
+      <View style={styles.flatListItem}>
+        <Text style={styles.fontItem}>{item + ":" + index}</Text>
       </View>
-    )
+    );
+  };
+
+  renderFooter = () => {
+    if (this.state.loading) {
+      return null
+    } else if (this.state.loadMore) {
+      return (
+          <View style={styles.footerInfinite}>
+            <ActivityIndicator
+                size={"small"}
+                animating={true}
+                color={"#75c5fe"}
+                style={{marginRight: 10}}
+            />
+            <Text style={styles.refreshFont}>加载中</Text>
+          </View>
+      )
+    } else if (this.state.data.length === 0) {
+      return <Text>暂无数据</Text>
+    } else {
+      return (
+          <View style={styles.footerContainer}>
+            <Text>到底了</Text>
+          </View>
+      )
+    }
   }
 
   render() {
     return (
-      <View style={Styles.wrap}>
-        <View style={{height: 40, width: Dimensions.get('window').width, backgroundColor: '#d5c639'}}/>
-        <PTRControl
-          dataSource={this.state.dataSource}
-          renderRow={this.renderRow}
-          showsVerticalScrollIndicator={false}
+        <View style={styles.wrap}>
+          <View
+              style={{
+                height: 40,
+                width: Dimensions.get("window").width,
+                backgroundColor: "#d5c639"
+              }}
+          />
+          <CustomList
+              data={this.state.data}
+              renderItem={this.renderRow}
+              keyExtractor={this._getKeyExtrator}
+              extraData={this.state.data.length}
+              // getRef={ref => (this.refOfScrollList = ref)}
+              enableHeaderRefresh
+              refreshState={this.state.loading}
+              setHeaderHeight={225}
+              onTopReachedThreshold={10}
+              headerRefresh={HeaderRefresh}
+              onHeaderRefreshing={this.refresh}
+              onEndReached={this.loadMore}
+              ListFooterComponent={this.renderFooter}
+              onEndReachedThreshold={0.8}
+              // enableFooterInfinite
+              // footerState={this.state.loading}
+              // setFooterHeight={130}
+              // onEndReachedThreshold={10}
+              // footerInfinite={FooterInfinite}
+              // onFooterInfiniting={this.loadMore}
 
-          scrollComponent={'ListView'}
-          getRef={ref => this.refOfScrollList = ref}
-
-          enableHeaderRefresh={true}
-          setHeaderHeight={100}
-          onTopReachedThreshold={10}
-          renderHeaderRefresh={
-            (gestureStatus, offset) => <HeaderRefresh gestureStatus={gestureStatus} offset={offset}/>
-          }
-          onHeaderRefreshing={() => {
-            clearTimeout(this._timer)
-            this._timer = setTimeout(() => {
-              this.getData(true)
-              this.setState({
-                dataSource: ds.cloneWithRows(this.data)
-              }, () => {
-                PTRControl.headerRefreshDone()
-              })
-            }, 1000)
-          }}
-
-          pullFriction={0.68}
-
-          enableFooterInfinite={true}
-          setFooterHeight={60}
-          onEndReachedThreshold={10}
-          renderFooterInfinite={
-            (gestureStatus, offset) => <FooterInfinite gestureStatus={gestureStatus} offset={offset}/>
-          }
-          onFooterInfiniting={() => {
-            clearTimeout(this._timer)
-            this._timer = setTimeout(() => {
-              this.getData()
-              this.setState({
-                dataSource: ds.cloneWithRows(this.data)
-              }, () => {
-                PTRControl.footerInfiniteDone()
-              })
-            }, 1000)
-          }}
-        />
-      </View>
-    )
+          />
+        </View>
+    );
   }
+
 }
 
-const Styles = StyleSheet.create({
+const styles = StyleSheet.create({
   wrap: {
     flex: 1,
-    overflow: 'hidden'
+    overflow: "hidden"
   },
   headerRefresh: {
-    width: Dimensions.get('window').width,
+    width: Dimensions.get("window").width,
     height: 100,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center'
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center"
   },
   footerInfinite: {
-    width: Dimensions.get('window').width,
+    width: Dimensions.get("window").width,
     height: 60,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center'
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center"
   },
   refreshFont: {
     fontSize: 16,
-    color: '#b84f35'
+    color: "#b84f35"
   },
   flatListItem: {
-    width: Dimensions.get('window').width,
+    width: Dimensions.get("window").width,
     height: 100,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     borderBottomWidth: 1,
-    borderBottomColor: '#feafea'
+    borderBottomColor: "#feafea"
   },
   fontItem: {
-    fontSize: 15,
+    fontSize: 15
   },
-})
+  footerContainer: {
+    backgroundColor: '#F2F2F2',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 130
+  },
+  footerImage: {
+    width: 141,
+    height: 50
+  },
+});
