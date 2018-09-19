@@ -2,7 +2,7 @@
 
 **Header animation**
 
-![]()
+![](https://github.com/hpmax00/react-native-custom-list/blob/master/screen.gif)
 
 ### Run example
 
