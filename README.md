@@ -25,7 +25,7 @@ import CustomList from "react-native-custom-list";
 
 
 export default class App extends React.Component {
-    render: function() {
+    render() {
         return (
           <CustomList
               data={this.state.data}
