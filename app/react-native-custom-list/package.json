@@ -1,14 +1,36 @@
 {
-  "name": "react-native-custom-list",
-  "version": "0.0.3",
-  "description": "customer flatlist",
-  "main": "index.js",
+  "name": "test",
+  "version": "0.0.5",
+  "private": false,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "test": "jest"
   },
+  "dependencies": {
+    "react": "16.4.1",
+    "react-native": "0.56.0"
+  },
+  "devDependencies": {
+    "babel-jest": "23.4.2",
+    "babel-preset-react-native": "^5",
+    "jest": "23.5.0",
+    "react-test-renderer": "16.4.1"
+  },
+  "jest": {
+    "preset": "react-native"
+  },
+  "bugs": {
+    "url": "https://github.com/hpmax00/react-native-custom-list/issues"
+  },
+  "homepage": "https://github.com/hpmax00/react-native-custom-list#readme",
+  "license": "MIT",
   "keywords": [
-    "list header"
-  ],
-  "author": "max",
-  "license": "MIT"
+    "react-component",
+    "react-native",
+    "ios",
+    "android",
+    "list",
+    "header refresh",
+    "pulldown animation"
+  ]
 }

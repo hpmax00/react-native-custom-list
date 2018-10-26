@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {Dimensions, StyleSheet, Text, View, Image, ActivityIndicator} from "react-native";
-import CustomList from "./app/react-native-custom-list";
+import {CustomList} from "./app/react-native-custom-list";
 import {HeaderRefresh} from "./app/HeaderRefresh";
 
 export default class Example extends Component {

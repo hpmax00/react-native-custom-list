@@ -17,11 +17,10 @@ import ScrollComponent from "./ScrollComponent";
 
 const { height } = Dimensions.get("window");
 
-export default class List extends Component {
+export default class CustomScrollView extends Component {
   static propTypes = {
     getRef: PropTypes.func,
 
-    enableHeaderRefresh: PropTypes.bool,
     setHeaderHeight: PropTypes.number,
     onTopReachedThreshold: PropTypes.number,
     // headerRefresh: PropTypes.elements,
@@ -29,11 +28,11 @@ export default class List extends Component {
 
     pullFriction: PropTypes.number,
 
-    enableFooterInfinite: PropTypes.bool,
-    setFooterHeight: PropTypes.number,
-    onEndReachedThreshold: PropTypes.number,
+    // enableFooterInfinite: PropTypes.bool,
+    // setFooterHeight: PropTypes.number,
+    // onEndReachedThreshold: PropTypes.number,
     // footerInfinite: PropTypes.elements,
-    onFooterInfiniting: PropTypes.func
+    // onFooterInfiniting: PropTypes.func
   };
 
   static defaultProps = {
@@ -64,19 +63,13 @@ export default class List extends Component {
   }
 
   render() {
-    let {
-      ...others
-    } = this.props;
-    let ListComponent = <FlatList {...others} />;
 
-    return React.cloneElement(ListComponent, {
-      renderScrollComponent: props => (
-        <ScrollComponent
-          {...props}
-          pullDownDistance={this.pullDownDistance}
-          pullDownThreshold={this.props.onTopReachedThreshold}
-        />
-      )
-    });
+    return (
+      <ScrollComponent
+        {...this.props}
+        pullDownDistance={this.pullDownDistance}
+        pullDownThreshold={this.props.onTopReachedThreshold}
+      />
+    )
   }
 }

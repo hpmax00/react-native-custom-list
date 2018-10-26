@@ -1,3 +1,5 @@
+[![npm version](https://badge.fury.io/js/react-native-custom-list.svg)](https://www.npmjs.com/package/react-native-custom-list) [![npm](https://img.shields.io/npm/dy/react-native-custom-list.svg)](https://www.npmjs.com/package/react-native-custom-list)
+
 ## Show Cases
 
 **Header animation**
@@ -21,11 +23,11 @@ $ npm install --save react-native-custom-list
 - Then, use this:
 
 ```typescript
-import CustomList from "react-native-custom-list";
+import { CustomList } from "react-native-custom-list";
 
 
 export default class App extends React.Component {
-    render: function() {
+    render() {
         return (
           <CustomList
               data={this.state.data}

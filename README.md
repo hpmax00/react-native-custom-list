@@ -23,7 +23,7 @@ $ npm install --save react-native-custom-list
 - Then, use this:
 
 ```typescript
-import CustomList from "react-native-custom-list";
+import { CustomList } from "react-native-custom-list";
 
 
 export default class App extends React.Component {
