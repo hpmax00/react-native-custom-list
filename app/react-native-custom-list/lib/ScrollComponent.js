@@ -168,6 +168,7 @@ export default class ScrollComponent extends Component {
     //定时是因为：存在可能scrollContentLayout函数调用比_headerRefreshDone函数调用慢，导致两个值的比较没有真实反映出scrollView的内容宽度
     if (done) {
       this._headerRefreshHandle = setTimeout(() => {
+            // 总高                                                       // view高度
         if (this.scrollContentHeight - this.props.pullDownDistance <= this.scrollViewHeight) {
           this._scrollView.setNativeProps({ scrollEnabled: false })
           Animated.timing(this.state.p_translateY, {
@@ -175,7 +176,8 @@ export default class ScrollComponent extends Component {
             duration: T_HEADER_ANI,
             useNativeDriver: true
           }).start(() => {
-            this.setState({ gestureStatus: G_STATUS_NONE })
+            // this.setState({ gestureStatus: G_STATUS_NONE })
+            this._setGestureStatus('_headerRefreshDone ', G_STATUS_NONE)
             this.state.p_currPullDistance = 0
             this._headerRefresh.setCurrOffset(this.state.p_currPullDistance, null)
           })
@@ -184,6 +186,7 @@ export default class ScrollComponent extends Component {
           this.state.p_translateY.setValue(0)
           this.state.p_currPullDistance = 0
           this.setState({ gestureStatus: G_STATUS_NONE })
+          // this._setGestureStatus('_headerRefreshDone ', G_STATUS_NONE)
           this._scrollToPos(0, this.props.pullDownDistance, true)
         }
       }, 200)
@@ -192,7 +195,7 @@ export default class ScrollComponent extends Component {
 
   _setGestureStatus = (callFrom, status) => {
     // this.state.gestureStatus = status;
-    // console.log(111111,callFrom)
+    // console.log(111111,callFrom, status)
     this.setState({ gestureStatus: status })
     this._headerRefresh.setGestureStatus(status)
   }
@@ -388,7 +391,7 @@ export default class ScrollComponent extends Component {
           onMomentumScrollEnd={this.onMomentumScrollEnd}
         >
           <Animated.View style={{ transform: [{ translateY: this.state.p_translateY }] }} onLayout={this.scrollContentLayout}>
-            <View ref={ref => (this._headerRefreshContainer = ref)} style={{ backgroundColor: 'transparent' }}>
+            <View ref={ref => (this._headerRefreshContainer = ref)} style={styles.headerRefreshContainer}>
               {this.renderHeaderRefresh()}
             </View>
             {this.props.children}
@@ -407,6 +410,9 @@ export default class ScrollComponent extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
+  },
+  headerRefreshContainer: {
+    backgroundColor: 'transparent',
   }
 })
