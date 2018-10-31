@@ -69,14 +69,20 @@ export default class List extends Component {
     } = this.props;
     let ListComponent = <FlatList {...others} />;
 
-    return React.cloneElement(ListComponent, {
-      renderScrollComponent: props => (
-        <ScrollComponent
-          {...props}
-          pullDownDistance={this.pullDownDistance}
-          pullDownThreshold={this.props.onTopReachedThreshold}
-        />
-      )
-    });
+    if (this.props.enableHeaderRefresh) {
+      return React.cloneElement(ListComponent, {
+        renderScrollComponent: props => (
+          <ScrollComponent
+            {...props}
+            pullDownDistance={this.pullDownDistance}
+            pullDownThreshold={this.props.onTopReachedThreshold}
+          />
+        )
+      });
+    } else {
+      return ListComponent
+    }
+
+
   }
 }
