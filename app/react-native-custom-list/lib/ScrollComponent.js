@@ -38,7 +38,7 @@ export default class ScrollComponent extends Component {
       dragDirection: 0, //-1上拉 0无 1下拉
 
       //用于不足一屏时的手势拖动
-      p_translateY: new Animated.Value(0),
+      p_translateY: new Animated.Value(-this.props.pullDownDistance),
       p_currPullDistance: this.props.pullDownDistance,
       p_lastPullDistance: 0,
       l_onTopReached_down: false
@@ -51,15 +51,6 @@ export default class ScrollComponent extends Component {
   }
 
   componentDidMount() {
-    // 复位header的100空白
-    if (Platform.OS === 'ios') {
-      this._scrollToPos(0, this.props.pullDownDistance, true)
-    } else {
-      this._timeout = setTimeout(() => {
-        this._scrollToPos(0, this.props.pullDownDistance, true)
-      }, 50)
-    }
-
     this._headerRefreshDoneHandle = this.props.enableHeaderRefresh
       ? DeviceEventEmitter.addListener(EVENT_HEADER_REFRESH, this._headerRefreshDone)
       : null
