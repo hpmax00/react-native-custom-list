@@ -18,6 +18,8 @@ export default class ScrollComponent extends Component {
   _headerRefreshDoneHandle = null //刷新操作完成监听句柄
   _headerRefresh = null //刷新头实例
 
+  init = true
+
   static defaultProps = {
     showsVerticalScrollIndicator: false,
     onHeaderRefreshing: _onHeaderRefreshing
@@ -35,7 +37,7 @@ export default class ScrollComponent extends Component {
 
       startPageY: 0,
       movePageY: 0,
-      dragDirection: 1, //-1上拉 0无 1下拉
+      dragDirection: 0, //-1上拉 0无 1下拉
 
       //用于不足一屏时的手势拖动
       p_translateY: new Animated.Value(-this.props.pullDownDistance),
@@ -236,13 +238,20 @@ export default class ScrollComponent extends Component {
     //未确定方向，可能从中部下拉到下拉刷新的阈值，也可能是从中部上拉到上拉加载的阈值
     else {
       //手指正在拖动视图
+
       if (onDrag) {
         //无状态
         if (gestureStatus === G_STATUS_NONE) {
           //开始下拉
           if (y <= this.props.pullDownDistance) {
-            this.state.dragDirection = 1
-            this._setGestureStatus('从位置方向下拉', STATUS_PULLING_DOWN)
+            if (!this.init) {
+              this.state.dragDirection = 1
+              this._setGestureStatus('从位置方向下拉', STATUS_PULLING_DOWN)
+            }
+          } else {
+            if (this.init) {
+              this.init = false
+            }
           }
         }
       }
@@ -366,7 +375,6 @@ export default class ScrollComponent extends Component {
   }
 
   render() {
-    // console.log(222222222222222222, this.state.dragDirection)
     return (
       <View style={styles.container} {...this._panResponder.panHandlers}>
         <ScrollView
@@ -381,6 +389,7 @@ export default class ScrollComponent extends Component {
           onScrollEndDrag={this.onScrollEndDrag}
           onMomentumScrollBegin={this.onMomentumScrollBegin}
           onMomentumScrollEnd={this.onMomentumScrollEnd}
+          removeClippedSubviews
         >
           <Animated.View style={{ transform: [{ translateY: this.state.p_translateY }] }} onLayout={this.scrollContentLayout}>
             <View ref={ref => (this._headerRefreshContainer = ref)} style={styles.headerRefreshContainer}>
