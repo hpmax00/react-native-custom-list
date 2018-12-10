@@ -19,6 +19,7 @@ export default class ScrollComponent extends Component {
   _headerRefresh = null //刷新头实例
 
   init = true
+  firestRefresh = true
 
   static defaultProps = {
     showsVerticalScrollIndicator: false,
@@ -223,8 +224,8 @@ export default class ScrollComponent extends Component {
         y <= this.props.pullDownDistance && this._headerRefresh.setCurrOffset(this.props.pullDownDistance - y, null)
       }
       //交互操作之后，视图正在滚动
-      else if (onScrollWithoutDrag) {
-      }
+      // else if (onScrollWithoutDrag) {
+      // }
       //函数滚动，scrollTo，scrollTo不会触发 onMomentumScrollBegin
       else {
         if (gestureStatus === G_STATUS_NONE) {
@@ -322,8 +323,12 @@ export default class ScrollComponent extends Component {
     if (dragDirection === 1) {
       if (gestureStatus === STATUS_PULLING_DOWN) {
         this.setState({ gestureStatus: G_STATUS_NONE })
-        this._scrollToPos(0, this.props.pullDownDistance, true)
+        // first scroll to top bug
+        !this.firestRefresh && this._scrollToPos(0, this.props.pullDownDistance, true)
       } else if (gestureStatus === STATUS_RELEASE_HEADER_TO_REFRESH) {
+        if (this.firestRefresh) {
+          this.firestRefresh = false
+        }
         this._setGestureStatus('onScrollEndDrag 下拉 松开加载', STATUS_HEADER_REFRESHING)
         this.props.onHeaderRefreshing instanceof Function && this.props.onHeaderRefreshing()
       }
@@ -347,7 +352,7 @@ export default class ScrollComponent extends Component {
     if (dragDirection === 0) {
       if (gestureStatus === G_STATUS_NONE) {
         if (contentOffset.y < this.props.pullDownDistance) {
-          this._scrollToPos(0, this.props.pullDownDistance, true)
+          !this.firestRefresh && this._scrollToPos(0, this.props.pullDownDistance, true)
         }
       }
     }
